@@ -451,7 +451,7 @@ flowchart TB
 |-----------------|--------------|------------------|---------------|----------------------|-----------------|---------------------|
 | REQ-CI-001      | interface.md | Controller       | TEST-CI-UNIT-101 | TEST-CI-INT-101 | TEST-CI-SYS-101 | TEST-CI-ACC-101 |
 | REQ-CI-002      | sequence.md  | CsvImportService | TEST-CI-UNIT-102 | TEST-CI-INT-102 | TEST-CI-SYS-102 | TEST-CI-ACC-102 |
-| REQ-CI-003      | sequence.md  | CsvValidator     | UT-103 | IT-103 | ST-103 | AT-103 |
+| REQ-CI-003      | sequence.md  | CsvValidator     | TEST-CI-UNIT-103 | TEST-CI-INT-103 | TEST-CI-SYS-103 | TEST-CI-ACC-103 |
 
 Traceability Agentは、要件に対する設計・コード・テストの未作成、不要な実装、変更後の追随漏れなどを検出する。人間が表を手作業で維持する運用は避け、自動生成・自動更新を基本とする。
 

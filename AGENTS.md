@@ -9,3 +9,6 @@
 
 - GitHub Project情報は `.agents/project.json` を参照
 - ファイルがないか `project` が `null` の場合は、[aide-initスキル](.agents/skills/aide-init/SKILL.md)でセットアップ
+# W-Model 開発規約
+
+Wモデル開発では、成果物と対応する検証を同時に設計します。共通原則、成果物の正本・配置、識別子、AIDEとの責務分担は[W-Model開発規約](.agents/docs/w-model/00-index.md)を参照してください。

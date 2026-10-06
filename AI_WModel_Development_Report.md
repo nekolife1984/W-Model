@@ -441,16 +441,16 @@ flowchart TB
     R --> AC["AC-CI-002"]
     R --> D["DESIGN-CI-004"]
     R --> C["CsvValidator"]
-    R --> UT["UT-CI-012"]
-    R --> IT["IT-CI-005"]
-    R --> ST["ST-CI-004"]
-    R --> AT["AT-CI-002"]
+    R --> UT["TEST-CI-UNIT-012"]
+    R --> IT["TEST-CI-INT-005"]
+    R --> ST["TEST-CI-SYS-004"]
+    R --> AT["TEST-CI-ACC-002"]
 ```
 
-| **Requirement** | **Design**   | **Code**         | **UT** | **IT** | **ST** | **AT** |
-|-----------------|--------------|------------------|--------|--------|--------|--------|
-| REQ-CI-001      | interface.md | Controller       | UT-101 | IT-101 | ST-101 | AT-101 |
-| REQ-CI-002      | sequence.md  | CsvImportService | UT-102 | IT-102 | ST-102 | AT-102 |
+| **Requirement** | **Design**   | **Code**         | **Unit test** | **Integration test** | **System test** | **Acceptance test** |
+|-----------------|--------------|------------------|---------------|----------------------|-----------------|---------------------|
+| REQ-CI-001      | interface.md | Controller       | TEST-CI-UNIT-101 | TEST-CI-INT-101 | TEST-CI-SYS-101 | TEST-CI-ACC-101 |
+| REQ-CI-002      | sequence.md  | CsvImportService | TEST-CI-UNIT-102 | TEST-CI-INT-102 | TEST-CI-SYS-102 | TEST-CI-ACC-102 |
 | REQ-CI-003      | sequence.md  | CsvValidator     | UT-103 | IT-103 | ST-103 | AT-103 |
 
 Traceability Agentは、要件に対する設計・コード・テストの未作成、不要な実装、変更後の追随漏れなどを検出する。人間が表を手作業で維持する運用は避け、自動生成・自動更新を基本とする。

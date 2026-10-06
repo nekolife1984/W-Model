@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "repository": {
+    "owner": "nekolife1984",
+    "name": "W-Model",
+    "url": "https://github.com/nekolife1984/W-Model"
+  },
+  "project_defaults": {
+    "title": null,
+    "visibility": "PRIVATE"
+  },
+  "project": {
+    "owner": "nekolife1984",
+    "owner_type": "User",
+    "number": 12,
+    "node_id": "PVT_kwHOALPqaM4Bl--f",
+    "title": "W-Model",
+    "url": "https://github.com/users/nekolife1984/projects/12",
+    "visibility": "PRIVATE",
+    "repository": "nekolife1984/W-Model"
+  }
+}

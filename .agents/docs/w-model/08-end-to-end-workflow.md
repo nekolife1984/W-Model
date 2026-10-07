@@ -21,7 +21,7 @@
 
 ### 工程ごとのGenerator・Reviewer・Test Designer接続
 
-全工程で、まずOrchestratorが入力正本とRevision、完了条件、範囲、停止条件を固定し、工程スキルを実行するGeneratorを起動します。Generatorの出力を正本へ保存してRevisionを固定した後、ReviewerとTest Designerをそれぞれ別の起動呼び出しで開始します。実装前工程のテスト設計担当は次工程の実装担当からも独立させます。Test Designerは開発成果物を知る前に要求・契約から期待結果を導出するのを原則とし、成果物を先に受け取った場合はその事実を記録して独立性の制約を評価します。
+全工程でOrchestratorが入力正本とRevision、完了条件、範囲、停止条件を固定します。工程の開始条件を満たした後、実装前に検証仕様を設計する工程ではTest Designerを先行起動し、上流の要求・契約正本だけから期待結果を導出して初版Revisionを固定します。続いてGeneratorが開発成果物を作成しRevisionを固定します。Test Designerはこの時点で初めて開発成果物を照合対象として受け取り、開発成果物に合わせた期待結果の変更はせず、不一致を記録します。Reviewerは固定済みの開発成果物を別実行で確認し、検証仕様Reviewerは検証仕様の初版と上流正本を別実行で確認します。各工程表の順序欄はこの一般順序を適用し、工程固有の異なる順序があれば明示します。実装前工程のテスト設計担当は次工程の実装担当からも独立させます。既に存在する実装の検証などで先行設計が適用できない場合、受領順と独立性への影響を記録して評価します。
 
 | 対象工程 | Generator | Reviewer | 独立Test Designerが受け取る正本・設計対象 |
 |---|---|---|---|
@@ -30,6 +30,12 @@
 | Task・詳細設計・Integration | `w-model-task-design`でTask・契約を作成 | 各Taskの範囲・依存・契約を確認 | 承認済みREQ/ACと上流設計からIntegration境界・前提・観測点・期待結果を作成。実装担当とは別にする。 |
 | 実装・Unit | `w-model-implementation`でコード・Unitを作成 | 独立Code Reviewerが契約逸脱・欠陥を確認 | 承認済み契約とUnit検証規約からケース・期待結果を設計する。コードは設計を固定した後の照合対象とする。Unit作成を実装者が担う場合も、独立レビューを省略しない。 |
 | 統合・回帰 | 該当なし（既存の開発成果物を対象Revisionで固定） | 必要な成果物・テスト差分を別Reviewerが確認 | 承認済みIntegration/System/Acceptance仕様から実行対象と期待結果を選定・設計する。Executorは別実行で結果を記録する。 |
+
+| 工程 | 実行順序 |
+|---|---|
+| 要件・受入 / Architecture・System / Task・詳細設計・Integration | 開始条件確認 → Test Designerが上流正本のみで検証仕様を先行設計・固定 → Generatorが開発成果物を作成・固定 → 開発成果物Reviewerと検証仕様Reviewerが別実行で確認 → Orchestratorが両者を照合 → 終了ゲート。 |
+| 実装・Unit | Task開始条件確認 → Test Designerが契約のみからUnit期待結果を先行設計・固定 → 検証仕様Reviewerが確認 → 実装Generatorが実装・Unitテストを作成・固定 → Code Reviewerが別実行で確認 → 対象Revisionで実行 → 成果物/仕様照合 → 終了ゲート。 |
+| 統合・回帰 | 対象Revision・承認済みテスト仕様確認 → Test Designerが適用ケースを選定・不足を設計 → 検証仕様Reviewerが確認 → Test Executorが別実行で実行 → 必要な成果物ReviewerとOrchestratorが照合 → 終了ゲート。 |
 
 各実行には一意な実行IDを付け、役割・担当・使用スキル、入力正本のパス/ID/完全なRevision、入力を受領した順序、目的・完了条件、出力正本/Revision、期待結果の根拠、検証コマンド・実結果、証跡の取得元を工程記録へ残します。未コミット成果物ではbase SHA・対象ファイル・差分SHA-256・共有取得方法を記録し、別担当が同一差分を取得できることを確認します。実行IDを発行できない環境では代替の一意な呼び出し識別子と環境を記録し、担当・実行を識別できなければ独立性未達とします。
 

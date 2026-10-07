@@ -41,6 +41,7 @@ Feature要求を正本・独立検証・ゲートに沿って工程間で引き�
 | Architecture・System | `w-model-architecture` | REQ/AC・制約とArchitecture | REQ/AC・非機能要求からSystem Test観点・期待結果を導出 |
 | Task・詳細設計・Integration | `w-model-task-design` | 要件・ArchitectureとTask契約 | 承認済み上流正本からIntegration境界・前提・期待結果を導出。実装者と分離 |
 | 実装・Unit | `w-model-implementation` | 契約と実装差分 | 承認済み契約からUnitケース・期待結果を導出。実装前に設計を固定 |
+| 統合・回帰 | 既存成果物の対象Revisionを固定 | 必要なテスト仕様・差分 | 承認済みIntegration/System/Acceptance仕様から適用ケースを選定し、不足仕様を設計。Test Executorは別実行で実行し証跡を記録 |
 
 Test Designerには、期待結果の根拠となる要求・契約正本、ID、Revision、対象範囲を渡します。開発成果物は設計後の照合対象とし、テスト仕様をそのコピーにしません。検証仕様ReviewerはTest Designerとは別実行で、正本から期待結果を再解釈し、曖昧さ・境界値・異常系・矛盾を確認します。Orchestratorは両独立確認の後にのみ開発成果物と検証仕様を照合します。
 
@@ -49,10 +50,13 @@ Test Designerには、期待結果の根拠となる要求・契約正本、ID�
 実行スキル：<w-model-requirements / w-model-architecture / w-model-task-design /
              w-model-implementation / w-model-traceability / w-model-qa>
 対象・Revision：<Feature/Task、Repository、branch、base/head SHA>
+実行担当・実行ID：<人/エージェント識別子、別起動呼び出しの一意ID>
 完了条件：<Issueまたは規約の参照>
-入力正本：<必要な相対パス、ID、URLだけ>
+入力正本・Revision・受領順：<必要な相対パス、ID、完全なSHAまたはDraft識別子、受領順>
 範囲・対象外：<明記>
-出力先・形式：<成果物正本またはレビュー/テスト記録>
+期待結果の根拠：<Test Designer/Executorは要求・契約正本とID。該当なしは理由>
+出力先・形式・Revision：<成果物正本またはレビュー/テスト記録>
+取得元・環境：<remote/refまたは共有成果物、環境・バージョン>
 制約・停止条件：<権限、OPEN判断、既存差分保護、環境制約>
 
 観測事実と推測を分けてください。対象Revision、変更ファイル、検証コマンドと

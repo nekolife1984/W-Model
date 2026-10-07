@@ -11,12 +11,35 @@
 | 役割 | 責務 | 分離要件 |
 |---|---|---|
 | Orchestrator | 全体計画、工程選択、依存・状態管理、ゲート評価、引き継ぎ・停止判断。 | 成果物の生成担当の自己承認をしない。 |
-| Generator | 指定工程の成果物を、指定された正本・スコープに作成または更新する。 | Reviewer/Testとは別のサブエージェント実行で行う。 |
-| Reviewer | Generatorと独立に、要求・契約・差分に対する欠落、矛盾、曖昧さ、規約逸脱を検出する。 | Generatorとは別実行にし、同じ成果物と必要な上流正本だけを渡す。Generatorの自己レビューを独立レビューとしない。 |
-| Test Designer / Executor | 適用テストを設計し、または既存の実行可能テストを対象Revisionで実行して証跡を報告する。 | 仕様・実装Generatorとは分離する。実行専任には不要な書き込み権限を与えない。 |
+| Generator | 指定工程の成果物を、指定された正本・スコープに作成または更新する。 | Reviewer/Test Designerとは別の起動呼び出しで行う。作成した検証仕様の独立レビューを兼ねない。 |
+| Reviewer | Generatorと独立に、要求・契約・差分に対する欠落、矛盾、曖昧さ、規約逸脱を検出する。 | Generatorとは別実行にし、同じ成果物と必要な上流正本だけを渡す。Generatorの自己レビューを独立レビューとしない。検証仕様の内容レビューはTest Designerの設計作業と分離する。 |
+| Test Designer | 開発成果物を作成・レビューした担当の解釈を引き継がず、要求・契約の正本から検証観点、ケース、期待結果、判定方法を導出する。 | Generatorおよび当該検証仕様のReviewerとは別実行にする。開発成果物や既存テストは照合対象として参照できるが、期待結果の根拠は要求・契約の正本に置く。 |
+| Test Executor | 承認済みの検証仕様・実行可能テストを対象Revisionで実行し、証跡を報告する。 | Test Designerおよび対象実装のGeneratorと分離する。実行専任には不要な書き込み権限を与えない。 |
 | Human Gate owner | 要件、方式、リスクなど人間判断を承認・却下・保留する。 | AIのQA判定・レビュー結果から承認を推定しない。 |
 
-各呼び出しには利用環境のサブエージェント起動機能で役割・スキルを指定する。カスタムエージェント定義ファイルを追加しない。各スキルの呼び出し規約は [.agents/skills](../../skills/) の工程スキルに従う。
+各呼び出しには利用環境のサブエージェント起動機能で役割・スキルを指定する。カスタムエージェント定義ファイルを追加しない。別実行は同じ会話で役割名を切り替えることではなく、別の起動呼び出しとして実行IDを区別できることを指す。OrchestratorがReviewer/Test Designerの成果を代筆したり、そのプロンプト・期待結果を事後に作って独立実行として記録したりしてはならない。環境が別実行または共有成果物の取得に対応しない場合は独立性未達として記録し、当該ゲートを停止する。各スキルの呼び出し規約は [.agents/skills](../../skills/) の工程スキルに従う。
+
+### 工程ごとのGenerator・Reviewer・Test Designer接続
+
+全工程でOrchestratorが入力正本とRevision、完了条件、範囲、停止条件を固定します。工程の開始条件を満たした後、実装前に検証仕様を設計する工程ではTest Designerを先行起動し、上流の要求・契約正本だけから期待結果を導出して初版Revisionを固定します。続いてGeneratorが開発成果物を作成しRevisionを固定します。Test Designerはこの時点で初めて開発成果物を照合対象として受け取り、開発成果物に合わせた期待結果の変更はせず、不一致を記録します。Reviewerは固定済みの開発成果物を別実行で確認し、検証仕様Reviewerは検証仕様の初版と上流正本を別実行で確認します。各工程表の順序欄はこの一般順序を適用し、工程固有の異なる順序があれば明示します。実装前工程のテスト設計担当は次工程の実装担当からも独立させます。既に存在する実装の検証などで先行設計が適用できない場合、受領順と独立性への影響を記録して評価します。
+
+| 対象工程 | 独立Test Designer（先行設計） | Generator | Reviewer |
+|---|---|---|---|
+| 要件・受入 | 要求原文、確定済み業務ルール、BDD採否から受入ケース・期待結果を作成。Feature仕様との照合は設計後に行う。 | `w-model-requirements`でFeature仕様を作成 | 要求原文とFeature仕様を照合 |
+| Architecture・System | REQ/AC、非機能要求、運用制約からSystem Test観点・環境・期待結果を作成。 | `w-model-architecture`でArchitecture・ADR案を作成 | REQ/AC・制約と設計の整合性を確認 |
+| Task・詳細設計・Integration | 承認済みREQ/ACと上流設計からIntegration境界・前提・観測点・期待結果を作成。実装担当とは別にする。 | `w-model-task-design`でTask・契約を作成 | 各Taskの範囲・依存・契約を確認 |
+| 実装・Unit | 承認済み契約とUnit検証規約からケース・期待結果を設計する。コードは設計を固定した後の照合対象とする。Unitケース・期待結果の設計とテストコードの実装を区別する。 | `w-model-implementation`でコードと、承認済みUnit仕様に基づくUnitテスト実装を作成 | 独立Code Reviewerが契約逸脱・欠陥を確認 |
+| 統合・回帰 | 承認済みIntegration/System/Acceptance仕様から実行対象と期待結果を選定・設計する。Executorは別実行で結果を記録する。 | 該当なし（既存の開発成果物を対象Revisionで固定） | 必要な成果物・テスト差分を別Reviewerが確認 |
+
+| 工程 | 実行順序 |
+|---|---|
+| 要件・受入 / Architecture・System / Task・詳細設計・Integration | 開始条件確認 → Test Designerが上流正本のみで検証仕様を先行設計・固定 → Generatorが開発成果物を作成・固定 → 開発成果物Reviewerと検証仕様Reviewerが別実行で確認 → Orchestratorが両者を照合 → 終了ゲート。 |
+| 実装・Unit | Task開始条件確認 → Test Designerが契約のみからUnit期待結果を先行設計・固定 → 検証仕様Reviewerが確認 → 実装Generatorが実装・Unitテストを作成・固定 → Code Reviewerが別実行で確認 → 対象Revisionで実行 → 成果物/仕様照合 → 終了ゲート。 |
+| 統合・回帰 | 対象Revision・承認済みテスト仕様確認 → Test Designerが適用ケースを選定・不足を設計 → 検証仕様Reviewerが確認 → Test Executorが別実行で実行 → 必要な成果物ReviewerとOrchestratorが照合 → 終了ゲート。 |
+
+各実行には一意な実行IDを付け、役割・担当・使用スキル、入力正本のパス/ID/完全なRevision、入力を受領した順序、目的・完了条件、出力正本/Revision、期待結果の根拠、検証コマンド・実結果、証跡の取得元を工程記録へ残します。未コミット成果物ではbase SHA・対象ファイル・差分SHA-256・共有取得方法を記録し、別担当が同一差分を取得できることを確認します。実行IDを発行できない環境では代替の一意な呼び出し識別子と環境を記録し、担当・実行を識別できなければ独立性未達とします。
+
+Test Designerの出力はReviewerが要求・契約の正本から独立にレビューし、期待結果の根拠、境界値・異常系、網羅対象、曖昧さ、誤った契約解釈の有無を確認します。Orchestratorはその後に、開発成果物と検証仕様をID・条件・観測値・期待結果ごとに照合します。いずれかに矛盾・欠落・独立レビューの必須指摘があれば、開始ゲートを通過させず、指摘と差戻し先を記録します。修正時は新Revisionを作り、該当担当が再実行し、新Revisionを対象に独立Reviewerが再確認します。旧判定を新Revisionへ引き継いではいけません。異なる解釈が人間判断を要する場合はOPENとしてHuman Gate ownerへエスカレーションし、確定までは後続工程を停止します。
 
 ## 工程と開始・終了ゲート
 
@@ -25,11 +48,11 @@
 | 工程 | 開始条件・入力 | 実行役割・スキル | 終了条件と次工程への引き継ぎ |
 |---|---|---|---|
 | 0. 開始・計画 | Feature要求、対象Repository/branch/base、既存状態を特定。依存Issueと情報保護条件を確認。 | Orchestrator | スコープ、工程順、担当分離、対象成果物・人間判断・検証方法を計画。曖昧な対象や取得不能な変更があれば開始停止。 |
-| 1. 要件・受入 | 要求原文、情報源、既存仕様・ID、BDD採否、要件確定者。 | Generator `w-model-requirements` → 別実行Reviewer。受入ケースの作成・レビューも独立実行。 | REQ/ACと要求元の対応、受入設計、レビュー記録、OPEN事項、正本へのリンクが揃う。未解決の必須指摘を修正・再レビュー。振る舞いに影響するOPEN事項はHuman Gateへ停止。 |
-| 2. Architecture・System | 確定済みREQ/AC、制約、外部依存、運用・非機能要求。 | Generator `w-model-architecture` → 別実行Reviewer。System Test設計を別担当で実行。 | 責務・境界・制約・ADR判断、REQとの対応、System観点・期待結果が揃い、必須レビュー指摘が解決。必要な方式Human Gateが保留ならTask分解へ進まない。 |
-| 3. Task・詳細設計・Integration | 承認済み要件・Architecture、依存関係とスコープ。 | Generator `w-model-task-design` → 各Taskの別実行Reviewer。Integration設計は実装担当と分離。 | Task Issueごとの範囲・依存・完了条件・DESIGN契約・Integration観点が揃い、矛盾と必須指摘がない。依存順を決め、Task単位で次工程へ渡す。 |
-| 4. 実装・Unit・Code Review | 着手可能Task、承認済み契約、関連REQ/AC、既存コードとテスト。 | Generator `w-model-implementation` → 独立Code Reviewer。Unitは実装者または別Test担当が作成可能だが、実装レビューを代替しない。 | 契約に沿う実装・Unit、実行結果、差分、残課題が特定され、独立レビューの必須指摘を修正・再レビュー済み。契約変更が必要なら上流工程へ戻す。 |
-| 5. 統合検証 | 関連Taskの実装・設計契約が利用可能で、Integration/System/Acceptance環境・データを特定。 | Test Designer / Executorを実装Generatorと別実行で起動。実行可能テストは `w-model-qa` に従って実行。 | 適用テストの状態、証跡、対象Revision、環境、失敗原因・未実行理由を記録。必須テストFAILまたは判定不能は後続QAゲートへPASSとして渡さない。 |
+| 1. 要件・受入 | 要求原文、情報源、既存仕様・ID、BDD採否、要件確定者。 | 独立Test Designer（要求原文から受入設計を先行固定） → Generator `w-model-requirements` → 開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | REQ/ACと要求元の対応、受入設計、独立レビュー記録、OPEN事項、正本へのリンクが揃う。未解決の必須指摘を修正・再レビュー。振る舞いに影響するOPEN事項はHuman Gateへ停止。 |
+| 2. Architecture・System | 確定済みREQ/AC、制約、外部依存、運用・非機能要求。 | 独立Test Designer（上流要求からSystem Test設計を先行固定） → Generator `w-model-architecture` → 開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | 責務・境界・制約・ADR判断、REQとの対応、System観点・期待結果が揃い、必須指摘が解決。必要な方式Human Gateが保留ならTask分解へ進まない。 |
+| 3. Task・詳細設計・Integration | 承認済み要件・Architecture、依存関係とスコープ。 | 独立Test Designer（上流要求・設計からIntegration設計を先行固定） → Generator `w-model-task-design` → 各Taskの開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | Task Issueごとの範囲・依存・完了条件・DESIGN契約・Integration観点が揃い、矛盾と必須指摘がない。依存順を決め、Task単位で次工程へ渡す。 |
+| 4. 実装・Unit・Code Review | 着手可能Task、承認済み契約、関連REQ/AC、既存コードとテスト。 | 独立Test Designerが契約からケース・期待結果を先行固定 → 検証仕様Reviewer → 実装Generator `w-model-implementation` がコードと承認済み仕様に基づくUnitテストコードを作成 → 独立Code Reviewer → テスト実行・成果物/仕様の照合。 | 契約に沿う実装・Unit、実行結果、差分、残課題が特定され、検証仕様レビューとCode Reviewの必須指摘を修正・再確認済み。契約変更が必要なら上流工程へ戻す。 |
+| 5. 統合検証 | 関連Taskの実装・設計契約が利用可能で、Integration/System/Acceptance環境・データを特定。 | Test Designerが承認済み仕様から適用テストを選定・不足設計 → 検証仕様Reviewer → Test Executorが実装Generatorとは別実行で対象Revisionを実行 → 必要な成果物Reviewerと照合。実行可能テストは `w-model-qa` に従う。 | 適用テストの状態、証跡、対象Revision、環境、失敗原因・未実行理由を記録。必須テストFAILまたは判定不能は後続QAゲートへPASSとして渡さない。 |
 | 6. Traceability・QA | 対象Revision、要求からコード・テスト・実行結果までの正本と証跡。 | `w-model-traceability` と `w-model-qa` を別々に起動。必要なら片方が作成した結果をもう片方が独立照合。 | ID・リンク・影響追随・証跡を照合し、QAレポートにPASS/FAIL/BLOCKED、未解決事項、戻り先を記録。QA PASSでもHuman Gate・PR承認を代替しない。 |
 | 7. Human PR Gate | 独立レビュー完了、必須検証とQA結果、最終差分、未解決事項の一覧。 | 人間のPRレビュアー。判断材料の整理はOrchestrator。 | 人間がPR承認・マージ可否を判断。未確定の人間判断・必須レビュー・品質条件が残る場合は保留し、責任者へ提示。対象リポジトリ固有のPR要件がある場合はそれも満たす。 |
 | 8. Release Gate | マージ済みの対象Revisionに加え、権限者が事前承認したRelease計画・必須基準へのリンク、対象バージョン、環境・構成、System/Acceptance証跡、既知問題、運用監視・ロールバック条件を入力として固定する。必須基準はFeatureまたはRelease計画で事前定義し、曖昧・未定義ならゲートを開始せず計画承認へ差し戻す。 | `w-model-qa` による対象Revision・証跡・基準の評価と、権限を持つRelease承認者による判断。 | QA判定（PASS/FAIL/BLOCKED）とRelease判断（承認／却下／保留）を別欄・別記録に残す。QA PASSはRelease承認を意味せず、リスク受容もQA結果を書き換えない。例外受容時は判断者・日時・対象Revision・対象リスク・期限・緩和策を記録する。必須基準未達または未承認なら実リリースを許可しない。ゲート終了時には判断記録と根拠が取得可能であることを確認する。実際のデプロイ後検証は本規約の範囲外。 |
@@ -45,7 +68,24 @@
 | Task・詳細設計・Integration | Task Issueと詳細設計契約 | Integration仕様（境界、前提、観測点、期待結果、環境・データ） | ReviewerがTask完了条件・契約と結合仕様の対応を確認。片方の欠落または必須指摘があれば実装を開始しない。 |
 | 実装・Unit | 実装コード | Unitテストと対象Revisionでの実行結果 | 独立Code Reviewerが実装とテストを確認し、実行結果を照合。テストまたは結果の欠落、失敗・判定不能、必須指摘があれば後続QAへ進まない。 |
 
-各ゲートで、両成果物の正本パス・ID・対象Revision、独立確認者・判定・指摘状態、受け入れた次工程入力、開始許可者・日時を作業記録へ残します。開始許可はHuman Gateを代替せず、許可範囲外の入力・保留事項を下流へ渡してはいけません。欠落・取得不能・不一致は未完了として扱い、推測で補わず該当工程で停止します。
+各ゲートで、両成果物の正本パス・ID・対象Revision、Generator/Reviewer/Test Designer/Executorの実行IDと入力・期待結果・出力、各独立確認者・判定・指摘状態、開発成果物と検証仕様の照合結果、受け入れた次工程入力、開始許可者・日時を作業記録へ残します。開始許可はHuman Gateを代替せず、許可範囲外の入力・保留事項を下流へ渡してはいけません。欠落・取得不能・不一致は未完了として扱い、推測で補わず該当工程で停止します。
+
+### 役割の兼務
+
+役割名は責務を表し、独立性は担当者と実行の関係で判定します。別実行であっても同じ担当者の自己確認は独立確認ではありません。
+
+| 兼務する役割 | 可否・条件 |
+|---|---|
+| Orchestrator + Generator | 可。ただし自身が作成した成果物についてReviewer/Test Designerを兼ねず、独立担当の起動・記録・ゲート確認は別途成立させる。 |
+| Orchestrator + Reviewer/Test Designer | 可。ただし同一工程のGeneratorを兼務していない場合に限る。割り当て競合があれば独立担当を優先し、成立しなければ停止する。 |
+| Generator + Reviewer（同一成果物） | 不可。別実行での自己レビューも独立レビューとして扱わない。 |
+| Generator + Test Designer（対応する検証仕様） | 不可。要求・契約の独立解釈を損なうため、別担当にする。 |
+| Test Designer + 検証仕様Reviewer（同一仕様） | 不可。検証仕様の独立レビューは別担当・別実行にする。 |
+| Test Designer + Test Executor | 可。検証仕様を確定して記録した後、Executorとして別実行で実行する。実行結果の独立確認が必要ならさらに別担当にする。 |
+| Code Reviewer + Test Designer（同一Task） | 不可。実装差分の知識が期待結果の独立導出に影響しないよう分離する。 |
+| Test Executor + Generator（対象実装） | 不可。対象コードの作成・変更権限を持つ担当は独立実行者としての実行結果を報告しない。 |
+
+複数工程を同じ人が担当する場合でも、直前工程の成果物を別の成果として自己レビューしないこと、検証仕様の導出前に実装・設計の結論を受け取った場合は順序と影響を記録することを条件とします。兼務可否が表にない場合はOrchestratorが独立性への影響を明示して割当を確定し、独立性が説明できなければ不可として扱います。
 
 **停止動作の確認例：** Feature仕様が完成していても受入仕様または実行可能な受入`.feature`がない場合、要件ゲートは未通過と記録し、Architecture工程の起動を拒否します。同様に、詳細設計があってもIntegration仕様がないTaskは実装を開始しません。欠落を補った後、同じ対象Revisionで両成果物を独立確認し、ゲート記録を完了してから再開します。
 
@@ -114,10 +154,13 @@ Human Gateは承認時点の仕様正本の完全なRevision、承認者、日�
 役割：<Generator / Reviewer / Test Designer / Test Executor>
 スキル：<工程スキル名>
 対象：<Feature/Task、Repository、branch、base/head SHA>
+実行担当・実行ID：<人/エージェント識別子、別起動呼び出しのID>
 目的・完了条件：<Issue/仕様へのリンクと確認可能な条件>
-入力正本：<必要最小限のパス、ID、参照URL。未確認は未確認と記載>
+入力正本・Revision・受領順：<必要最小限のパス、ID、完全なSHA/Draft識別子、受領順。未確認は未確認と記載>
 作業範囲・対象外：<明示>
-出力先・形式：<正本パス、レビュー記録、テスト結果等>
+期待結果の根拠：<Test Designer/Executorの場合、要求・契約正本とID。該当なしは理由>
+出力先・形式・Revision：<正本パス、レビュー記録、テスト結果等>
+取得元・環境：<共有remote/refまたは共有成果物、環境・バージョン>
 制約：<既存変更保護、権限、機密、ツール制約>
 停止条件：<仕様矛盾、OPEN判断、アクセス不能、必須ゲート未達等>
 
@@ -128,7 +171,9 @@ Human Gateは承認時点の仕様正本の完全なRevision、承認者、日�
 
 ### GeneratorからReviewer/Testへの引き継ぎ
 
-Generatorの成果物を書き出して対象Revisionを固定した後にのみ、独立Reviewer/Testを起動する。未コミット成果物を共有する場合、同一共有ワークスペース等から同一差分を取得できることを確認し、base SHA・対象ファイル・差分ハッシュ・取得方法を特定する。取得可能性がないレビューは完了扱いしない。
+独立ReviewerはGeneratorの成果物を書き出して対象Revisionを固定した後に起動します。実装前に独立テスト設計が必要な工程では、Test Designerは上流正本だけを入力として先行起動し、対象の開発成果物が固定された後に照合します。Test Designerが開発成果物を先に受領する順序は避け、避けられない場合は受領順と独立性への影響を記録します。未コミット成果物を共有する場合、同一共有ワークスペース等から同一差分を取得できることを確認し、base SHA・対象ファイル・差分ハッシュ・取得方法を特定します。取得可能性がないレビューは完了扱いしません。
+
+Test Designerには要求・契約の入力正本だけを先に渡し、開発成果物やGeneratorの説明は検証仕様の初版を固定した後に照合用として渡します。順序を守れない環境では、受領した情報と独立性への影響を記録し、期待結果の根拠を上流正本から再確認します。成果物を参照した事実を隠して「独立導出」と記録してはいけません。
 
 Reviewerには、Generatorの自己評価や結論を先に渡さず、対象仕様・対象差分・完了条件・レビュー観点を渡す。Test担当には期待結果の正本・テストID・実行対象Revision・コマンド・環境制約を渡す。独立実行とは別サブエージェント呼び出しであり、同じ実行会話で役割名だけを切り替えることではない。
 

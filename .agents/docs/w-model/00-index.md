@@ -8,6 +8,7 @@
 - [要件定義と受入テスト設計](02-requirements-and-acceptance.md)：REQ・ACの具体化、独立レビュー、受入テスト観点、Human Gate。
 - [Architectureとシステムテスト設計](03-architecture-and-system-test.md)：要件を構成・責務・制約へ落とし込み、非機能要件を含むシステム検証とArchitecture判断のHuman Gateを設計。
 - [Task分解と詳細設計・結合テスト](04-task-decomposition-and-detailed-design.md)：Featureを依存関係の明確なTaskへ分解し、実装と結合テストが共有する薄い契約を定義。
+- [実装と単体テスト](05-implementation-and-unit-testing.md)：Task・詳細設計契約から実装と実行可能な単体テストを作成し、独立レビューと仕様逸脱時の差し戻しを行う。
 
 ## 適用範囲
 

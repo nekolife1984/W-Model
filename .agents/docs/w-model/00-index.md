@@ -9,6 +9,7 @@
 - [Architectureとシステムテスト設計](03-architecture-and-system-test.md)：要件を構成・責務・制約へ落とし込み、非機能要件を含むシステム検証とArchitecture判断のHuman Gateを設計。
 - [Task分解と詳細設計・結合テスト](04-task-decomposition-and-detailed-design.md)：Featureを依存関係の明確なTaskへ分解し、実装と結合テストが共有する薄い契約を定義。
 - [実装と単体テスト](05-implementation-and-unit-testing.md)：Task・詳細設計契約から実装と実行可能な単体テストを作成し、独立レビューと仕様逸脱時の差し戻しを行う。
+- [トレーサビリティ検証](06-traceability.md)：対応表の生成・更新、欠落・参照切れ・変更追随の検証。
 
 ## 適用範囲
 

@@ -10,6 +10,7 @@
 - [Task分解と詳細設計・結合テスト](04-task-decomposition-and-detailed-design.md)：Featureを依存関係の明確なTaskへ分解し、実装と結合テストが共有する薄い契約を定義。
 - [実装と単体テスト](05-implementation-and-unit-testing.md)：Task・詳細設計契約から実装と実行可能な単体テストを作成し、独立レビューと仕様逸脱時の差し戻しを行う。
 - [トレーサビリティ検証](06-traceability.md)：対応表の生成・更新、欠落・参照切れ・変更追随の検証。
+- [テスト運用とQAゲート](07-test-operations-and-qa.md)：テストレベルの運用、証跡・失敗分類、QA判定とHuman Gateの分離。
 
 ## 適用範囲
 

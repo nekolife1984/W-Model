@@ -10,7 +10,7 @@
 
 | REQ ID / 要件リンク | AC ID / 受入検証 | DESIGN ID / 設計リンク | 実装状態・リンク | ACC | SYS | INT | UNIT | 変更・根拠 |
 |---|---|---|---|---|---|---|---|---|
-| `REQ-CI-001`（`docs/10-features/customer-import.md#req-ci-001`） | `AC-CI-001`（`docs/50-test/acceptance/customer-import.md#test-ci-acc-001`） | —（適用外: 利用者から見える振る舞いのみ） | 実装済み: `src/import/Controller.ts` | `TEST-CI-ACC-001` / 設計済み・未実行 | —（適用外: 個別REQの受入検証で確認） | —（適用外: コンポーネント間契約を定めない） | —（適用外: 独立した局所ロジックなし） | 初回登録 |
+| `REQ-CI-001`（`docs/10-features/customer-import.md#req-ci-001`） | `AC-CI-001`（`docs/50-test/acceptance/customer-import.md#test-ci-acc-001`） | —（適用外: 利用者から見える振る舞いのみ） | 実装済み: `src/import/Controller.ts` | `TEST-CI-ACC-001` / 設計済み・未実施 | 適用性=N/A; 実行状態=—; 個別REQにSystem境界/品質制約なし; 代替=`TEST-CI-ACC-001`; 再評価=REQにSystem要件追加 | 適用性=N/A; 実行状態=—; 個別REQに独立契約境界なし; 代替=`TEST-CI-ACC-001`; 再評価=独立IF/永続化契約追加 | 適用性=N/A; 実行状態=—; 独立した局所ロジックなし; 代替=`TEST-CI-ACC-001`; 再評価=局所ロジックを追加 | 初回登録 |
 
 例のリンク先は形式を示す仮のパスであり、実際のFeatureではRepository内の正本に置き換える。各行はREQを起点にし、関連するすべての成果物と必要な検証レベルを記録する。複数の成果物・検証がある場合はIDとリンクを複数併記する。
 

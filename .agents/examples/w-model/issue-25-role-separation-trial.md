@@ -24,8 +24,8 @@
 | Test Designer `test-designer-issue25-20261007-01` | 要求fixture v1のみ。Generator出力は初版設計時に未提示。 | 独立ケース案。割引対象の複数解釈（割引10円または11円）と丸めOPENを記録し、金額ゲートをBLOCKED。 |
 | 開発成果物Reviewer `FCR-25-20261007-01` | 要求fixture v1とREQ/AC案 | 割引対象と丸めが一意でないためBLOCKED。 |
 | Test Designer照合 `test-designer-issue25-20261007-02` | 要求fixture v1、Designer初版、AC-25-2 | ACが送料を注文に加えた後に割引する解釈を含意し得る一方、初版に商品小計だけ割引する解釈例がある差を検出。要件・受入へ差戻し、正本の判断待ちでゲート保留。 |
-| 修正Generator `GEN-ISSUE25-SAVE10-20261007-01` | Fixture owner判断（v2） | `SAVE10-REQ-R2`: 割引は商品小計のみ、送料は割引対象外、税は割引後商品小計と送料の合計に対して算出し、1円単位で四捨五入。期待値は割引10円、課税基礎100円、税10円、最終110円。 |
-| Test Designer再設計 `TD-ISSUE25-SAVE10-20261007-02` | 正本 `SAVE10-REQ-R2`。Generator出力は設計入力に含めない。 | 新Revisionを基に再設計。期待値10円/100円/10円/110円。v1の判定を流用せず。 |
+| 修正Generator `GEN-ISSUE25-SAVE10-20261007-01` | Fixture owner判断（v2） | [`issue-25-save10-requirements-v2.md`](issue-25-save10-requirements-v2.md) に `SAVE10-REQ-R2`、REQ/AC、期待値を保存。割引10円、課税基礎100円、税10円、最終110円。 |
+| Test Designer再設計 `TD-ISSUE25-SAVE10-20261007-02` | 正本 `SAVE10-REQ-R2`。Generator出力は設計入力に含めない。 | [`issue-25-save10-test-designer-r2.md`](issue-25-save10-test-designer-r2.md) に新Revisionを基にした独立ケースを保存。期待値10円/100円/10円/110円。v1判定を流用せず。 |
 | 検証仕様Reviewer `RVW-ISSUE25-SAVE10-20261007-01` | `SAVE10-REQ-R2`とTest Designer再設計 | 期待値を独立計算して一致を確認。必須指摘なし、提案のみで通過。 |
 | Test Executor `EXEC-ISSUE25-SAVE10-20261007-01` | `SAVE10-REQ-R2`、受入ケース、対象手順Revision `6ea3da5b1aea2258976b3ca0c51e57c73a5ea356` | 割引10円→商品小計90円→課税基礎100円→税10円→最終110円を算術照合しPASS。実装コードはなく、ソフトウェア実行ではない。 |
 
@@ -35,3 +35,7 @@
 - Test Designerは要求fixtureを独立解釈して複数の割引対象を示し、Generator成果物との後続照合でAC-25-2の解釈差を検出した。要件・受入へ差し戻し、fixture ownerの判断で正本をv2へ更新した。
 - v2の別実行でTest Designerが再設計し、独立した検証仕様Reviewerが新Revisionで期待値を再確認した。旧Revisionの判定は引き継いでいない。
 - 実装コードに対するUnit/Acceptance実行は未実施。算術照合を実装テスト完了として扱わない。
+
+## Test Executorの再現手順
+
+アプリケーションと実行コマンドがないため、契約式を手計算で照合した。`割引額=100×0.10=10円`; `割引後商品小計=100−10=90円`; `課税基礎=90+10=100円`; `税=round_half_up(100×0.10)=10円`; `最終額=90+10+10=110円`。期待値と全て一致。入力正本・期待値は上記のv2正本とTest Designer成果物を参照。実行ログおよびソフトウェアテスト結果は存在しない。

@@ -31,6 +31,7 @@ The target repository must contain the template and this setup script. Review th
 - A single existing `W-Model 開発案内` section is a no-op only when its normalized content matches the rendered template. Duplicate, edited, or unrelated sections with the same heading are conflicts: show the diff and stop without writing.
 - If `AGENTS.md` is absent, show and write a new file containing the rendered section. Re-running after a successful setup is idempotent.
 - Validate every relative Markdown link in the template against an existing regular file within the target root. Do not follow symlinks while validating paths; reject encoded or ambiguous local destinations rather than guessing how Markdown will resolve them.
+- Concurrent runs of this setup script on the same repository are serialized with an exclusive lock on the target root directory; after acquiring it, the script rechecks that `AGENTS.md` still matches the bytes it originally read and stops on a competing edit.
 
 ## Verification
 

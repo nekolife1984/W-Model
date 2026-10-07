@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import difflib
+import fcntl
 import os
 import re
 import secrets
@@ -48,7 +49,7 @@ def _read_utf8(path: Path) -> str:
 def _validate_link(root: Path, target: str) -> None:
     if target.startswith(("https://", "http://", "mailto:")) or target.startswith("#"):
         return
-    if any(char.isspace() for char in target) or any(char in target for char in "<>\\%()"):
+    if any(char in target for char in "<>\\%()"):
         raise SetupError(f"曖昧または符号化されたリンク先は使用できません: {target}")
     path_text = target.split("#", 1)[0].split("?", 1)[0]
     if not path_text:
@@ -72,6 +73,51 @@ def _validate_link(root: Path, target: str) -> None:
             raise SetupError(f"リンク先にsymlinkがあります: {target}")
     if not current.is_relative_to(root) or not stat.S_ISREG(current.lstat().st_mode):
         raise SetupError(f"リンク先がRepository内の通常ファイルではありません: {target}")
+
+
+def _markdown_destination(target: str) -> str:
+    value = target.strip()
+    if value.startswith("<"):
+        closing = value.find(">")
+        if closing < 0:
+            raise SetupError(f"不正なMarkdownリンク先です: {target}")
+        destination, suffix = value[1:closing], value[closing + 1:].strip()
+    else:
+        parts = value.split(None, 1)
+        destination, suffix = parts[0], parts[1] if len(parts) == 2 else ""
+    if suffix and not (
+        (suffix[0] == suffix[-1] and suffix[0] in "\"'")
+        or (suffix[0] == "(" and suffix[-1] == ")")
+    ):
+        raise SetupError(f"不正または未対応のMarkdownリンクタイトルです: {target}")
+    if not destination or any(char.isspace() for char in destination):
+        raise SetupError(f"不正なMarkdownリンク先です: {target}")
+    return destination
+
+
+def _template_links(template: str) -> list[str]:
+    visible_lines: list[str] = []
+    in_fence = False
+    fence_char = ""
+    fence_size = 0
+    for line in template.splitlines():
+        fence = FENCE.match(line)
+        if fence:
+            marker = fence.group(1)
+            if not in_fence and not (marker[0] == "`" and "`" in fence.group(2)):
+                in_fence, fence_char, fence_size = True, marker[0], len(marker)
+            elif in_fence and marker[0] == fence_char and len(marker) >= fence_size and not fence.group(2).strip():
+                in_fence = False
+            visible_lines.append("")
+        elif in_fence:
+            visible_lines.append("")
+        else:
+            visible_lines.append(line)
+    visible = "\n".join(visible_lines)
+    links = LINK.findall(visible)
+    if visible.count("](") != len(links) or re.search(r"\]\s*\[[^\]]*\]|^\s*\[[^\]]+\]:|\bhref\s*=", visible, re.MULTILINE | re.IGNORECASE):
+        raise SetupError("テンプレートに未対応または解析できないリンク構文があります")
+    return links
 
 
 def _headings(text: str) -> list[re.Match[str]]:
@@ -143,6 +189,7 @@ def _write_atomic(root: Path, content: bytes, original: bytes | None, mode: int 
     root_fd = os.open(root, flags)
     temporary = f".AGENTS.md.{secrets.token_hex(8)}.tmp"
     try:
+        fcntl.flock(root_fd, fcntl.LOCK_EX)
         temp_flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
         fd = os.open(temporary, temp_flags, 0o600, dir_fd=root_fd)
         with os.fdopen(fd, "wb") as stream:
@@ -183,8 +230,10 @@ def setup(root: Path) -> str:
     template_path = root / TEMPLATE
     _ordinary(template_path)
     template = _read_utf8(template_path)
-    for link in LINK.findall(template):
-        _validate_link(root, link.strip())
+    for link in _template_links(template):
+        if any(char.isspace() for char in link.strip()) and not re.search(r"\s+(?:\"[^\"]*\"|'[^']*'|\([^)]*\))$", link.strip()):
+            raise SetupError(f"不正または未対応のMarkdownリンクです: {link}")
+        _validate_link(root, _markdown_destination(link))
 
     destination = root / "AGENTS.md"
     exists = _ordinary(destination, optional=True)

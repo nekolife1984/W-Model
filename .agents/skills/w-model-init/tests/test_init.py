@@ -114,15 +114,17 @@ class SetupTests(unittest.TestCase):
             init.setup(self.root)
         self.assertFalse((self.root / "AGENTS.md").exists())
 
-    def test_encoded_and_title_bearing_links_are_rejected(self) -> None:
+    def test_encoded_or_external_links_are_rejected_and_titles_are_parsed(self) -> None:
         path = self.root / init.TEMPLATE
         original = path.read_text(encoding="utf-8")
-        for link in ("%2e%2e/outside.md", ".agents/docs/w-model/00-index.md 'title'"):
+        for link in ("%2e%2e/outside.md", "../../outside.md 'title'"):
             with self.subTest(link=link):
                 path.write_text(original.replace(".agents/docs/w-model/00-index.md", link), encoding="utf-8")
                 with self.assertRaises(init.SetupError):
                     init.setup(self.root)
                 self.assertFalse((self.root / "AGENTS.md").exists())
+        path.write_text(original.replace(".agents/docs/w-model/00-index.md", ".agents/docs/w-model/00-index.md 'title'"), encoding="utf-8")
+        self.assertIn("作成", init.setup(self.root))
         path.write_text(original, encoding="utf-8")
 
     def test_concurrent_destination_change_is_not_overwritten(self) -> None:

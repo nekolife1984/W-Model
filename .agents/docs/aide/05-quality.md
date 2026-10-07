@@ -14,19 +14,15 @@
 - 未実施・失敗した検証は成功扱いにしない。理由と残作業を記録し、未解決の完了条件があればIssueを完了にしない。
 - 設定済みの必須CIがある場合は、その成功を確認する。CIがない場合は、関連するローカル検証を実行する。
 
-## AIDEのCI
+## このRepositoryの検証
 
-このCIはAIDEテンプレート自体の検証専用で、生成先リポジトリではジョブを実行しない。チェッカーの単体テストはCPython 3.11〜3.14、全Markdown文書の走査はCPython 3.14で実行する。ローカルでは次を実行する。
+W-Modelセットアップの検証は、Repositoryルートで次を実行する。
 
 ```sh
-PYTHONDONTWRITEBYTECODE=1 python -m pip install --requirement requirements-ci.txt
-PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s scripts/tests -v
-PYTHONDONTWRITEBYTECODE=1 python scripts/check_markdown_links.py
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .agents/skills/w-model-init/tests -v
 ```
 
-Markdown検証は`requirements-ci.txt`で固定したGitHub Flavored Markdownパーサーを使う。
-
-`.github/workflows/ci.yml`はAIDEリポジトリの`main`向けPull Requestと`main`へのpushで検証を実行する。GitHubテンプレートから生成されたリポジトリへWorkflowファイルが複製されても、AIDE以外では全ジョブをスキップする。パスフィルターで必須チェックが未実行にならないよう、AIDE内の検証は毎回実行する。
+文書変更では、相対リンクのファイル・見出しが実在することを確認する。`AGENTS.md.template`のリンクは配置先のRepositoryルートを基準にし、成果物テンプレートのプレースホルダーは生成時に実在する正本へ置き換える。検査方法と結果をPRへ記録する。
 
 ## 完了判定
 

@@ -23,13 +23,13 @@
 
 全工程でOrchestratorが入力正本とRevision、完了条件、範囲、停止条件を固定します。工程の開始条件を満たした後、実装前に検証仕様を設計する工程ではTest Designerを先行起動し、上流の要求・契約正本だけから期待結果を導出して初版Revisionを固定します。続いてGeneratorが開発成果物を作成しRevisionを固定します。Test Designerはこの時点で初めて開発成果物を照合対象として受け取り、開発成果物に合わせた期待結果の変更はせず、不一致を記録します。Reviewerは固定済みの開発成果物を別実行で確認し、検証仕様Reviewerは検証仕様の初版と上流正本を別実行で確認します。各工程表の順序欄はこの一般順序を適用し、工程固有の異なる順序があれば明示します。実装前工程のテスト設計担当は次工程の実装担当からも独立させます。既に存在する実装の検証などで先行設計が適用できない場合、受領順と独立性への影響を記録して評価します。
 
-| 対象工程 | Generator | Reviewer | 独立Test Designerが受け取る正本・設計対象 |
+| 対象工程 | 独立Test Designer（先行設計） | Generator | Reviewer |
 |---|---|---|---|
-| 要件・受入 | `w-model-requirements`でFeature仕様を作成 | 要求原文とFeature仕様を照合 | 要求原文、確定済み業務ルール、BDD採否から受入ケース・期待結果を作成。Feature仕様との照合は設計後に行う。 |
-| Architecture・System | `w-model-architecture`でArchitecture・ADR案を作成 | REQ/AC・制約と設計の整合性を確認 | REQ/AC、非機能要求、運用制約からSystem Test観点・環境・期待結果を作成。 |
-| Task・詳細設計・Integration | `w-model-task-design`でTask・契約を作成 | 各Taskの範囲・依存・契約を確認 | 承認済みREQ/ACと上流設計からIntegration境界・前提・観測点・期待結果を作成。実装担当とは別にする。 |
-| 実装・Unit | `w-model-implementation`でコード・Unitを作成 | 独立Code Reviewerが契約逸脱・欠陥を確認 | 承認済み契約とUnit検証規約からケース・期待結果を設計する。コードは設計を固定した後の照合対象とする。Unit作成を実装者が担う場合も、独立レビューを省略しない。 |
-| 統合・回帰 | 該当なし（既存の開発成果物を対象Revisionで固定） | 必要な成果物・テスト差分を別Reviewerが確認 | 承認済みIntegration/System/Acceptance仕様から実行対象と期待結果を選定・設計する。Executorは別実行で結果を記録する。 |
+| 要件・受入 | 要求原文、確定済み業務ルール、BDD採否から受入ケース・期待結果を作成。Feature仕様との照合は設計後に行う。 | `w-model-requirements`でFeature仕様を作成 | 要求原文とFeature仕様を照合 |
+| Architecture・System | REQ/AC、非機能要求、運用制約からSystem Test観点・環境・期待結果を作成。 | `w-model-architecture`でArchitecture・ADR案を作成 | REQ/AC・制約と設計の整合性を確認 |
+| Task・詳細設計・Integration | 承認済みREQ/ACと上流設計からIntegration境界・前提・観測点・期待結果を作成。実装担当とは別にする。 | `w-model-task-design`でTask・契約を作成 | 各Taskの範囲・依存・契約を確認 |
+| 実装・Unit | 承認済み契約とUnit検証規約からケース・期待結果を設計する。コードは設計を固定した後の照合対象とする。Unitケース・期待結果の設計とテストコードの実装を区別する。 | `w-model-implementation`でコードと、承認済みUnit仕様に基づくUnitテスト実装を作成 | 独立Code Reviewerが契約逸脱・欠陥を確認 |
+| 統合・回帰 | 承認済みIntegration/System/Acceptance仕様から実行対象と期待結果を選定・設計する。Executorは別実行で結果を記録する。 | 該当なし（既存の開発成果物を対象Revisionで固定） | 必要な成果物・テスト差分を別Reviewerが確認 |
 
 | 工程 | 実行順序 |
 |---|---|

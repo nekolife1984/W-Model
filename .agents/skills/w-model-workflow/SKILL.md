@@ -35,13 +35,13 @@ Feature要求を正本・独立検証・ゲートに沿って工程間で引き�
 
 各サブエージェントは別の起動呼び出しで、対象に必要な最小限の情報だけを受け取ります。利用環境の起動形式に応じて、次の共通依頼を役割ごとに作ります。
 
-| 工程 | Generator | Reviewer | Test Designerの独立入力・成果 |
+| 工程 | Test Designerの先行する独立入力・成果 | Generator | Reviewer |
 |---|---|---|---|
-| 要件・受入 | `w-model-requirements` | 要求原文とFeature仕様 | 要求原文・確定ルール・BDD採否から受入ケースと期待結果を導出 |
-| Architecture・System | `w-model-architecture` | REQ/AC・制約とArchitecture | REQ/AC・非機能要求からSystem Test観点・期待結果を導出 |
-| Task・詳細設計・Integration | `w-model-task-design` | 要件・ArchitectureとTask契約 | 承認済み上流正本からIntegration境界・前提・期待結果を導出。実装者と分離 |
-| 実装・Unit | `w-model-implementation` | 契約と実装差分 | 承認済み契約からUnitケース・期待結果を導出。実装前に設計を固定 |
-| 統合・回帰 | 既存成果物の対象Revisionを固定 | 必要なテスト仕様・差分 | 承認済みIntegration/System/Acceptance仕様から適用ケースを選定し、不足仕様を設計。Test Executorは別実行で実行し証跡を記録 |
+| 要件・受入 | 要求原文・確定ルール・BDD採否から受入ケースと期待結果を導出 | `w-model-requirements` | 要求原文とFeature仕様 |
+| Architecture・System | REQ/AC・非機能要求からSystem Test観点・期待結果を導出 | `w-model-architecture` | REQ/AC・制約とArchitecture |
+| Task・詳細設計・Integration | 承認済み上流正本からIntegration境界・前提・期待結果を導出。実装者と分離 | `w-model-task-design` | 要件・ArchitectureとTask契約 |
+| 実装・Unit | 承認済み契約からUnitケース・期待結果を導出。実装前に設計を固定 | `w-model-implementation` | 契約と実装差分 |
+| 統合・回帰 | 承認済みIntegration/System/Acceptance仕様から適用ケースを選定し、不足仕様を設計。Test Executorは別実行で実行し証跡を記録 | 既存成果物の対象Revisionを固定 | 必要なテスト仕様・差分 |
 
 Test Designerには、期待結果の根拠となる要求・契約正本、ID、Revision、対象範囲を渡します。開発成果物は設計後の照合対象とし、テスト仕様をそのコピーにしません。検証仕様ReviewerはTest Designerとは別実行で、正本から期待結果を再解釈し、曖昧さ・境界値・異常系・矛盾を確認します。Orchestratorは両独立確認の後にのみ開発成果物と検証仕様を照合します。
 

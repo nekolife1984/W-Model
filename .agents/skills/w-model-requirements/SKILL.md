@@ -46,17 +46,18 @@ Feature要求を、追跡可能で受入検証できる仕様へ整理します�
 - Human Gate記録: 承認者、日付、承認対象Revision、決定済み・保留の事項
 - 次工程への引き継ぎ: 確定済みREQ/AC ID、制約・参照、関連受入テスト、残る判断事項
 
-## 実行例
+## 呼び出し例
 
 ```text
-w-model-requirements を実行してください。
-入力: <Feature要求・Issue URL>
-参照: <既存Feature仕様・共通仕様>
-Feature略号: CI
-BDD: 採用 / 非採用 / 未決
-出力: docs/10-features/customer-import.md と対応する受入仕様
-要件確定者: <担当者または未確定>
-独立レビュー: 自分とは別の担当者・サブエージェントに依頼
+次のFeature要求を w-model-requirements スキルに従って整理してください。
+要求元: <Issue URLまたは要求文>
+Feature略号: <Repository内で一意な略号>
+BDD: <採用／非採用／未決>
+参照仕様: <関連リンク、または未確認>
+要件確定者: <担当者、または未確定>
+
+BDDや要件が未決の場合は推測で選ばず、確認事項として提示してください。
+振る舞いに影響する未確定事項が残る場合は、Human Gateで停止してください。
 ```
 
 詳細なREQ/AC例、レビュー観点、BDDと非BDDの仕様例は[要件定義規約](../../docs/w-model/02-requirements-and-acceptance.md)を参照してください。

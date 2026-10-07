@@ -1,6 +1,6 @@
-# W-Model
+# W-Model Development Workflow
 
-W-Modelは、開発成果物と対応する検証を各工程で対にして作成し、独立レビューと人間の判断で工程をつなぐ開発ワークフローです。このRepositoryでは、W-Modelを既存の開発Repositoryへ導入するための規約・スキル・テンプレートを提供します。
+W-Model Development Workflowは、開発成果物と対応する検証を各工程で対にして作成し、独立レビューと人間の判断で工程をつなぐ開発ワークフローです。このRepositoryでは、W-Modelを既存の開発Repositoryへ導入するための規約・スキル・テンプレートを提供します。
 
 ## 目的
 

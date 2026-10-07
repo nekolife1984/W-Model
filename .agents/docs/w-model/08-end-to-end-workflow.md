@@ -47,9 +47,9 @@ Test Designerの出力はReviewerが要求・契約の正本から独立にレ�
 
 | 工程 | 開始条件・入力 | 実行役割・スキル | 終了条件と次工程への引き継ぎ |
 |---|---|---|---|
-| 0. 開始・計画 | Feature要求、対象Repository/branch/base、既存状態を特定。依存Issueと情報保護条件を確認。 | Orchestrator | スコープ、工程順、担当分離、対象成果物・人間判断・検証方法を計画。曖昧な対象や取得不能な変更があれば開始停止。 |
+| 0. 開始・計画 | Feature要求、対象Repository/branch/base、既存状態を特定。依存Issueと情報保護条件を確認。 | Orchestrator | スコープ、工程順、担当分離、対象成果物・人間判断・検証方法、テストレベル適用性の初期評価を計画。曖昧な対象や取得不能な変更があれば開始停止。 |
 | 1. 要件・受入 | 要求原文、情報源、既存仕様・ID、BDD採否、要件確定者。 | 独立Test Designer（要求原文から受入設計を先行固定） → Generator `w-model-requirements` → 開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | REQ/ACと要求元の対応、受入設計、独立レビュー記録、OPEN事項、正本へのリンクが揃う。未解決の必須指摘を修正・再レビュー。振る舞いに影響するOPEN事項はHuman Gateへ停止。 |
-| 2. Architecture・System | 確定済みREQ/AC、制約、外部依存、運用・非機能要求。 | 独立Test Designer（上流要求からSystem Test設計を先行固定） → Generator `w-model-architecture` → 開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | 責務・境界・制約・ADR判断、REQとの対応、System観点・期待結果が揃い、必須指摘が解決。必要な方式Human Gateが保留ならTask分解へ進まない。 |
+| 2. Architecture・System | 確定済みREQ/AC、制約、外部依存、運用・非機能要求。 | 独立Test Designer（上流要求からSystem Test設計と適用性根拠を先行固定） → Generator `w-model-architecture` → 開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | 責務・境界・制約・ADR判断、REQとの対応、System観点・期待結果、各レベル判断が揃い、N/A根拠が独立確認され、必須指摘が解決。必要な方式Human Gateが保留ならTask分解へ進まない。 |
 | 3. Task・詳細設計・Integration | 承認済み要件・Architecture、依存関係とスコープ。 | 独立Test Designer（上流要求・設計からIntegration設計を先行固定） → Generator `w-model-task-design` → 各Taskの開発成果物Reviewer・検証仕様Reviewer → 成果物/仕様の照合。 | Task Issueごとの範囲・依存・完了条件・DESIGN契約・Integration観点が揃い、矛盾と必須指摘がない。依存順を決め、Task単位で次工程へ渡す。 |
 | 4. 実装・Unit・Code Review | 着手可能Task、承認済み契約、関連REQ/AC、既存コードとテスト。 | 独立Test Designerが契約からケース・期待結果を先行固定 → 検証仕様Reviewer → 実装Generator `w-model-implementation` がコードと承認済み仕様に基づくUnitテストコードを作成 → 独立Code Reviewer → テスト実行・成果物/仕様の照合。 | 契約に沿う実装・Unit、実行結果、差分、残課題が特定され、検証仕様レビューとCode Reviewの必須指摘を修正・再確認済み。契約変更が必要なら上流工程へ戻す。 |
 | 5. 統合検証 | 関連Taskの実装・設計契約が利用可能で、Integration/System/Acceptance環境・データを特定。 | Test Designerが承認済み仕様から適用テストを選定・不足設計 → 検証仕様Reviewer → Test Executorが実装Generatorとは別実行で対象Revisionを実行 → 必要な成果物Reviewerと照合。実行可能テストは `w-model-qa` に従う。 | 適用テストの状態、証跡、対象Revision、環境、失敗原因・未実行理由を記録。必須テストFAILまたは判定不能は後続QAゲートへPASSとして渡さない。 |
@@ -59,16 +59,16 @@ Test Designerの出力はReviewerが要求・契約の正本から独立にレ�
 
 ### 成果物と検証の対による工程ゲート
 
-工程成果物と、それを検証する仕様・ケースは一組です。工程担当は両方を同じスコープ・Revisionで揃え、Orchestratorは独立確認の完了前に次工程へ進めてはいけません。
+工程成果物と、それを検証する仕様・ケースは一組です。工程担当は両方を同じスコープ・Revisionで揃え、Orchestratorは独立確認の完了前に次工程へ進めてはいけません。テストレベルのN/A判断も検証計画の一部として同じRevisionに記録し、適用外の対象範囲・根拠・代替検証・再評価条件を独立確認します。環境不足等で必要なテストを実行できない場合は未実施とし、N/Aとしてゲートを通してはいけません。
 
 | 工程 | 開発成果物 | 対応する検証成果物 | 独立確認と終了条件 |
 |---|---|---|---|
 | 要件・受入 | Feature仕様（REQ/AC） | 受入仕様（BDDなら実行可能な`.feature`、非BDDなら受入仕様書） | Reviewerが要求とREQ/AC、受入仕様の対応・期待結果を確認。片方の欠落、必須指摘、未確定の受入判定があれば停止。 |
-| Architecture・System | Architecture・制約・ADR案 | System Test設計（観点、環境、データ、期待結果・判定方法） | Reviewerが設計とSystem Test設計の追跡性・判定可能性を確認。片方の欠落または必須指摘があればTask分解へ進まない。 |
+| Architecture・System | Architecture・制約・ADR案、各テストレベルの適用性判断 | System Test設計（観点、環境、データ、期待結果・判定方法） | Reviewerが設計・検証仕様・各レベル判断を確認。N/Aには責務/リスク根拠、残余リスク、代替検証、再評価条件が必要。片方の欠落、独立確認未実施または必須指摘があればTask分解へ進まない。 |
 | Task・詳細設計・Integration | Task Issueと詳細設計契約 | Integration仕様（境界、前提、観測点、期待結果、環境・データ） | ReviewerがTask完了条件・契約と結合仕様の対応を確認。片方の欠落または必須指摘があれば実装を開始しない。 |
 | 実装・Unit | 実装コード | Unitテストと対象Revisionでの実行結果 | 独立Code Reviewerが実装とテストを確認し、実行結果を照合。テストまたは結果の欠落、失敗・判定不能、必須指摘があれば後続QAへ進まない。 |
 
-各ゲートで、両成果物の正本パス・ID・対象Revision、Generator/Reviewer/Test Designer/Executorの実行IDと入力・期待結果・出力、各独立確認者・判定・指摘状態、開発成果物と検証仕様の照合結果、受け入れた次工程入力、開始許可者・日時を作業記録へ残します。開始許可はHuman Gateを代替せず、許可範囲外の入力・保留事項を下流へ渡してはいけません。欠落・取得不能・不一致は未完了として扱い、推測で補わず該当工程で停止します。
+各ゲートで、両成果物の正本パス・ID・対象Revision、Generator/Reviewer/Test Designer/Executorの実行IDと入力・期待結果・出力、各独立確認者・判定・指摘状態、開発成果物と検証仕様の照合結果、テストレベル別の適用性・N/A根拠・代替検証・再評価条件、受け入れた次工程入力、開始許可者・日時を作業記録へ残します。開始許可はHuman Gateを代替せず、許可範囲外の入力・保留事項を下流へ渡してはいけません。欠落・取得不能・不一致は未完了として扱い、推測で補わず該当工程で停止します。
 
 ### 役割の兼務
 
@@ -129,6 +129,9 @@ Test Designerの出力はReviewerが要求・契約の正本から独立にレ�
 - 検証: <観点/TEST ID、コマンド、結果 PASS/FAIL/BLOCKED/未実施>
 - 証跡: <ログ・レポート等の正本リンクと取得方法>
 - 独立確認: <確認者、対象入力/出力Revision、判定、指摘IDと状態。該当なしは理由>
+- テストレベル適用性: <Unit/Integration/System/Acceptanceごとの適用/N/A、責務・リスク根拠、代替TEST ID・期待結果、再評価条件>
+- N/A独立確認: <Reviewer、対象Revision、判定、指摘状態>
+- 未実施テスト: <理由・影響・解消責任者/次の行動。必須ならQA BLOCKED>
 - Human Gate: <対象仕様Revision、判断者、判断日時、承認/却下/保留、判断内容。不要なら理由>
 - 未解決事項: <ID、内容、影響、担当、または「なし」>
 - 次工程開始可否: `可` | `不可`。許可者・日時・受け渡す入力Revision: <値>

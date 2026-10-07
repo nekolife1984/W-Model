@@ -11,11 +11,11 @@
 - [実装と単体テスト](05-implementation-and-unit-testing.md)：Task・詳細設計契約から実装と実行可能な単体テストを作成し、独立レビューと仕様逸脱時の差し戻しを行う。
 - [トレーサビリティ検証](06-traceability.md)：対応表の生成・更新、欠落・参照切れ・変更追随の検証。
 - [テスト運用とQAゲート](07-test-operations-and-qa.md)：テストレベルの運用、証跡・失敗分類、QA判定とHuman Gateの分離。
-- [エンドツーエンド実行フロー](08-end-to-end-workflow.md)：工程ゲート、サブエージェントの分離・引き継ぎ、修正上限、Escalation・中断再開。
+- [エンドツーエンド実行フロー](08-end-to-end-workflow.md)：Revision付き工程状態・記録、ゲート遷移と無効化、Human Gate、役割分離・引き継ぎ、Escalation・中断再開。
 
 ## 適用範囲
 
-ここではWモデルに関する開発成果物と検証の設計を定めます。Issue、PR、ブランチ、コミット、Project Status、レビュー記録などの作業管理方法は、この規約の対象外です。
+ここではWモデルに関する開発成果物と検証の設計を定めます。Issue、PR、ブランチ、コミット、Project Status、レビュー記録などの作業管理方法自体はAIDE規約の対象です。ただし工程状態・Revisionと判定の結び付けは、この規約のエンドツーエンド実行フローを正本とします。Project StatusはIssue全体の進捗であり、工程ゲートの判定には使いません。
 
 ## 変更時の原則
 

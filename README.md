@@ -18,6 +18,6 @@ Wモデルによる開発ワークフロー
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-テスト仕様は`docs/50-test/{unit,integration,acceptance}/task-reminder.md`、対応表は[`docs/90-traceability/task-reminder.md`](docs/90-traceability/task-reminder.md)を参照してください。
+テスト仕様は[`docs/50-test/`](docs/50-test/)、対応表は[`docs/90-traceability/task-reminder.md`](docs/90-traceability/task-reminder.md)、実行結果は[QAレポート](docs/50-test/task-reminder-qa.md)と[承認後の工程実行記録](docs/w-model-trials/task-reminder/08-approved-execution.md)を参照してください。
 
 規約の入口は[W-Model開発規約](.agents/docs/w-model/00-index.md)、工程スキルの一覧は[統括スキル](.agents/skills/w-model-workflow/SKILL.md)を参照してください。

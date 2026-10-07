@@ -34,4 +34,4 @@
 
 ## 承認後の実行
 
-依頼者のHuman Gate承認後、確定したFeature仕様・Architecture・詳細設計・Unit/Integration/Acceptance仕様・実装・Traceabilityを作成し、各レベルの実行可能テストを通しました。工程ごとの結果と対象RevisionのQA記録は、最終成果物に追加します。
+依頼者のHuman Gate承認後、確定したFeature仕様・Architecture・詳細設計・Unit/Integration/Acceptance仕様・実装・Traceabilityを作成し、各レベルの実行可能テストを通しました。工程ごとの結果は[承認後実行記録](08-approved-execution.md)、対象Revisionの検証根拠は[QAレポート](../../50-test/task-reminder-qa.md)を参照してください。

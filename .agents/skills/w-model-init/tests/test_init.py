@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import os
+import stat
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -110,6 +113,54 @@ class SetupTests(unittest.TestCase):
         with self.assertRaises(init.SetupError):
             init.setup(self.root)
         self.assertFalse((self.root / "AGENTS.md").exists())
+
+    def test_encoded_and_title_bearing_links_are_rejected(self) -> None:
+        path = self.root / init.TEMPLATE
+        original = path.read_text(encoding="utf-8")
+        for link in ("%2e%2e/outside.md", ".agents/docs/w-model/00-index.md 'title'"):
+            with self.subTest(link=link):
+                path.write_text(original.replace(".agents/docs/w-model/00-index.md", link), encoding="utf-8")
+                with self.assertRaises(init.SetupError):
+                    init.setup(self.root)
+                self.assertFalse((self.root / "AGENTS.md").exists())
+        path.write_text(original, encoding="utf-8")
+
+    def test_concurrent_destination_change_is_not_overwritten(self) -> None:
+        destination = self.root / "AGENTS.md"
+        destination.write_text("# Original\n", encoding="utf-8")
+        original_writer = init._write_atomic
+
+        def race(root: Path, content: bytes, original: bytes | None, mode: int | None = None) -> None:
+            destination.write_text("# Concurrent edit\n", encoding="utf-8")
+            original_writer(root, content, original, mode)
+
+        with patch.object(init, "_write_atomic", side_effect=race):
+            with self.assertRaises(init.SetupError):
+                init.setup(self.root)
+        self.assertEqual("# Concurrent edit\n", destination.read_text(encoding="utf-8"))
+
+    def test_special_destination_is_rejected_and_mode_is_preserved(self) -> None:
+        destination = self.root / "AGENTS.md"
+        os.mkfifo(destination)
+        with self.assertRaises(init.SetupError):
+            init.setup(self.root)
+        destination.unlink()
+        destination.write_text("# Existing\n", encoding="utf-8")
+        destination.chmod(0o640)
+        init.setup(self.root)
+        self.assertEqual(0o640, stat.S_IMODE(destination.stat().st_mode))
+
+    def test_headings_inside_fenced_code_are_ignored(self) -> None:
+        destination = self.root / "AGENTS.md"
+        destination.write_text("````markdown\n# Sample\n## W-Model 開発案内\n````\n", encoding="utf-8")
+        init.setup(self.root)
+        result = destination.read_text(encoding="utf-8")
+        self.assertTrue(result.startswith("````markdown\n# Sample\n## W-Model 開発案内\n````\n"))
+        headings = init._headings(result)
+        self.assertEqual(2, len(headings))
+        self.assertEqual("W-Model 開発案内", headings[0].group(3))
+        self.assertEqual("作業の進め方", headings[1].group(3))
+        self.assertEqual(1, len(headings[0].group(2)))
 
 
 if __name__ == "__main__":

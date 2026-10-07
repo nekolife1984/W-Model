@@ -30,7 +30,7 @@ The target repository must contain the template and this setup script. Review th
 - Append the section without changing existing bytes other than adding a separator newline if required. Existing document headings determine the inserted heading depth: use depth 2 if the shallowest existing heading is level 1, otherwise use that shallowest depth; use depth 1 when there are no headings.
 - A single existing `W-Model 開発案内` section is a no-op only when its normalized content matches the rendered template. Duplicate, edited, or unrelated sections with the same heading are conflicts: show the diff and stop without writing.
 - If `AGENTS.md` is absent, show and write a new file containing the rendered section. Re-running after a successful setup is idempotent.
-- Validate every relative Markdown link in the template against an existing regular file within the target root. Do not follow symlinks while validating paths.
+- Validate every relative Markdown link in the template against an existing regular file within the target root. Do not follow symlinks while validating paths; reject encoded or ambiguous local destinations rather than guessing how Markdown will resolve them.
 
 ## Verification
 

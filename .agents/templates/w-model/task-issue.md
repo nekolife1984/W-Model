@@ -35,3 +35,11 @@
 ## 未確定事項・進行制限
 - <OPEN事項、影響ID、判断者。なければ「なし」>
 - <このTaskの着手・完了を止める条件。なければ「なし」>
+
+## Task・詳細設計・Integrationゲート
+- 対応する詳細設計・Revision：<リンクとRevision、DESIGN ID>
+- 対応するIntegration仕様・Revision：<リンクとRevision、TEST ID>
+- 独立確認：<両成果物を確認したレビュアー、対象Revision、判定、必須指摘の状態>
+- ゲート判定：`未確認` | `未通過` | `通過`（設計またはIntegration仕様の欠落・未レビューなら未通過）
+- 実装へ渡す入力・制約：<REQ/AC/DESIGN/TEST、依存、保留範囲>
+- 実装開始許可：<許可者・日時、または未許可>

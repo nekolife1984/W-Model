@@ -1,0 +1,32 @@
+{
+  "files": [
+    ".agents/docs/w-model/00-index.md",
+    ".agents/docs/w-model/01-common-principles.md",
+    ".agents/docs/w-model/02-requirements-and-acceptance.md",
+    ".agents/docs/w-model/03-architecture-and-system-test.md",
+    ".agents/docs/w-model/04-task-decomposition-and-detailed-design.md",
+    ".agents/docs/w-model/05-implementation-and-unit-testing.md",
+    ".agents/docs/w-model/06-traceability.md",
+    ".agents/docs/w-model/07-test-operations-and-qa.md",
+    ".agents/docs/w-model/08-end-to-end-workflow.md",
+    ".agents/skills/w-model-architecture/SKILL.md",
+    ".agents/skills/w-model-implementation/SKILL.md",
+    ".agents/skills/w-model-init/SKILL.md",
+    ".agents/skills/w-model-init/scripts/init.py",
+    ".agents/skills/w-model-init/tests/test_init.py",
+    ".agents/skills/w-model-qa/SKILL.md",
+    ".agents/skills/w-model-requirements/SKILL.md",
+    ".agents/skills/w-model-task-design/SKILL.md",
+    ".agents/skills/w-model-traceability/SKILL.md",
+    ".agents/skills/w-model-workflow/SKILL.md",
+    ".agents/templates/w-model/acceptance-spec.md",
+    ".agents/templates/w-model/adr.md",
+    ".agents/templates/w-model/architecture-spec.md",
+    ".agents/templates/w-model/detailed-design.md",
+    ".agents/templates/w-model/feature-spec.md",
+    ".agents/templates/w-model/integration-test-spec.md",
+    ".agents/templates/w-model/system-test-spec.md",
+    ".agents/templates/w-model/task-issue.md",
+    ".agents/templates/w-model/AGENTS.md.template"
+  ]
+}

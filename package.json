@@ -1,0 +1,22 @@
+{
+  "name": "w-model-existing-repo-installer",
+  "version": "0.1.0",
+  "description": "Safely install W-Model guidance into an existing repository",
+  "bin": {
+    "w-model-install": "bin/w-model-install.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/w_model_install.py",
+    "scripts/w_model_install_manifest.json",
+    ".agents/docs/w-model/",
+    ".agents/templates/w-model/",
+    ".agents/skills/w-model-*/SKILL.md",
+    ".agents/skills/w-model-init/scripts/init.py",
+    ".agents/skills/w-model-init/tests/test_init.py",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

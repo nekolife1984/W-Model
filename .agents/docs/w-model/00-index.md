@@ -11,6 +11,7 @@
 - [実装と単体テスト](05-implementation-and-unit-testing.md)：Task・詳細設計契約から実装と実行可能な単体テストを作成し、独立レビューと仕様逸脱時の差し戻しを行う。
 - [トレーサビリティ検証](06-traceability.md)：対応表の生成・更新、欠落・参照切れ・変更追随の検証。
 - [テスト運用とQAゲート](07-test-operations-and-qa.md)：テストレベルの運用、証跡・失敗分類、QA判定とHuman Gateの分離。
+- [エンドツーエンド実行フロー](08-end-to-end-workflow.md)：工程ゲート、サブエージェントの分離・引き継ぎ、修正上限、Escalation・中断再開。
 
 ## 適用範囲
 

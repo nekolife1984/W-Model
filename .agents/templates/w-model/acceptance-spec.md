@@ -2,7 +2,7 @@
 
 > Feature仕様: [<feature spec>](../../10-features/<feature>.md)
 > Feature ID: `<FEATURE>`
-> 正本: `Markdown`（同一シナリオを実行可能な`.feature`へ重複記載しない）
+> 正本: `Markdown`（非BDD時のみ。BDD採用時は実行可能な`.feature`を正本とし、同一シナリオを本書へ複製しない）
 
 ## テスト方針
 
@@ -33,3 +33,11 @@
 ## 未確定事項
 
 - `OPEN-001`: <質問、影響するREQ/AC/シナリオ、判断者>
+
+## 要件・受入ゲート
+
+- 対応するFeature仕様・Revision：<リンクとRevision>
+- 開発成果物との対応：<REQ/AC IDとTEST IDの対応確認>
+- 独立確認：<レビュアー、対象Revision、判定、必須指摘の状態>
+- ゲート判定：`未確認` | `未通過` | `通過`（Feature仕様または方式に応じた受入仕様（Markdown / `.feature`）の欠落・未レビューなら未通過）
+- 次工程の開始許可：<許可者・日時、引き継ぐ入力・制約。Human Gateは別記録>

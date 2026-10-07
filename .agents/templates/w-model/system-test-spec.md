@@ -50,6 +50,14 @@
 |---|---|---|
 | <REQ/AC IDまたはArchitecture見出し・リンク> | <TEST IDとリンク> | <期待結果、またはOPEN/非適用理由> |
 
+## Architecture・System Testゲート
+
+- 対応するArchitecture・Revision：<リンクとRevision>
+- 開発成果物と検証成果物のID対応：<Architecture見出し・REQ/AC・TEST ID>
+- 独立確認：<両成果物を確認したレビュアー、対象Revision、判定、必須指摘の状態>
+- ゲート判定：`未確認` | `未通過` | `通過`（どちらかの欠落・未レビュー・必須指摘未解決なら未通過）
+- 次工程の開始許可：<許可者・日時、引き継ぐ入力・制約>
+
 ## レビュー・承認
 
 - 独立レビュー：<対象Revision、レビュアー、判定、指摘と状態>

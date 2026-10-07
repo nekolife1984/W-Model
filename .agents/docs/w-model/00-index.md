@@ -5,6 +5,7 @@
 ## 共通ルール
 
 - [共通原則と成果物管理](01-common-principles.md)：開発成果物と検証の対応、SSOTと配置、識別子、成果物間の参照。
+- [要件定義と受入テスト設計](02-requirements-and-acceptance.md)：REQ・ACの具体化、独立レビュー、受入テスト観点、Human Gate。
 
 ## 適用範囲
 

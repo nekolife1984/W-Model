@@ -1,44 +1,44 @@
 ---
 name: w-model-init
-description: Add the W-Model development guidance to a repository's root AGENTS.md safely from its dedicated template.
+description: 専用テンプレートを使い、RepositoryルートのAGENTS.mdへW-Model開発案内を安全に追加する。
 ---
 
-# W-Model Repository Setup
+# W-Model Repositoryセットアップ
 
-Use this skill when adding W-Model guidance to a repository. The dedicated source is `.agents/templates/w-model/AGENTS.md.template`; do not change `.agents/templates/AGENTS.md.template`, which is owned by `aide-init`.
+RepositoryへW-Model開発案内を追加するときに、このスキルを使用します。専用テンプレートは `.agents/templates/w-model/AGENTS.md.template` です。`aide-init` が使用する `.agents/templates/AGENTS.md.template` は変更しないでください。
 
-## Run
+## 実行方法
 
-From the target repository root, inspect the repository and template, then run:
+対象Repositoryのルートで、対象Repositoryとテンプレートを確認してから次を実行します。
 
 ```sh
 python3 .agents/skills/w-model-init/scripts/init.py
 ```
 
-An optional positional argument selects another existing target repository root:
+引数には、別の既存Repositoryのルートを指定できます。
 
 ```sh
 python3 .agents/skills/w-model-init/scripts/init.py /path/to/repository
 ```
 
-The target repository must contain the template and this setup script. Review the template and the target `AGENTS.md` before accepting changes. The script prints a unified diff before writing. It never merges or overwrites a conflicting or edited W-Model section; resolve such cases manually and rerun only when the existing section exactly matches the template.
+対象Repositoryには、テンプレートとこのセットアップスクリプトが必要です。変更を適用する前に、テンプレートと対象の `AGENTS.md` を確認してください。スクリプトは書き込み前にunified形式の差分を表示します。既存のW-Model案内に編集や競合がある場合、統合・上書きは行いません。差分を確認して手動で解決し、既存セクションがテンプレートと完全一致する状態で再実行してください。
 
-## Safety and update rules
+## 安全性と更新規則
 
-- Require a real directory root and ordinary, non-symlink `.agents`, `.agents/templates`, template, and root `AGENTS.md` paths. Reject missing/non-directory parents, symlinks, special files, unreadable files, invalid UTF-8, and malformed or unsafe template links without writing.
-- The template must be exactly one Markdown section rooted at `## W-Model 開発案内`. Its child heading levels are shifted to fit the target document; an ambiguous heading structure or level beyond six is rejected.
-- Append the section without changing existing bytes other than adding a separator newline if required. Existing document headings determine the inserted heading depth: use depth 2 if the shallowest existing heading is level 1, otherwise use that shallowest depth; use depth 1 when there are no headings.
-- A single existing `W-Model 開発案内` section is a no-op only when its normalized content matches the rendered template. Duplicate, edited, or unrelated sections with the same heading are conflicts: show the diff and stop without writing.
-- If `AGENTS.md` is absent, show and write a new file containing the rendered section. Re-running after a successful setup is idempotent.
-- Validate every relative Markdown link in the template against an existing regular file within the target root. Do not follow symlinks while validating paths; reject encoded or ambiguous local destinations rather than guessing how Markdown will resolve them.
-- Concurrent runs of this setup script on the same repository are serialized with an exclusive lock on the target root directory; after acquiring it, the script rechecks that `AGENTS.md` still matches the bytes it originally read and stops on a competing edit.
+- ルートは実在するディレクトリでなければなりません。`.agents`、`.agents/templates`、テンプレート、ルートの `AGENTS.md` は通常のファイル／ディレクトリであることを確認し、symlink、特殊ファイル、読込不能なファイル、不正なUTF-8、形式不正または安全でないテンプレートリンクを検出した場合は書き込まず停止します。
+- テンプレートは `## W-Model 開発案内` をルートとする単一のMarkdownセクションでなければなりません。子見出しの深さは対象文書に合わせて調整します。文書構造が曖昧な場合や、見出しレベルが6を超える場合は停止します。
+- セクションは、区切りの改行が必要な場合を除き、既存ファイルの内容を変更せず末尾へ追加します。既存文書の見出しに合わせて追加する見出しレベルを決めます。最も浅い既存見出しがレベル1ならレベル2、それ以外は最も浅い見出しと同じレベルにします。見出しがない場合はレベル1を使います。
+- 既存の `W-Model 開発案内` セクションが1つだけあり、正規化後の内容がテンプレートから生成した内容と一致する場合に限り、何も変更しません。同名見出しの重複、手編集、または別内容のセクションは競合として差分を表示し、書き込まず停止します。
+- `AGENTS.md` がない場合は、生成するセクションを表示したうえで新規作成します。セットアップ後に再実行しても重複しません。
+- テンプレート内の相対Markdownリンクはすべて、対象Repository内にある通常ファイルを参照しているか検証します。検証時にsymlinkはたどりません。Markdownの解釈が曖昧になる符号化リンク先などは、推測せず拒否します。
+- 同一Repositoryでこのセットアップスクリプトを並行実行した場合は、対象ルートディレクトリの排他ロックで直列化します。ロック取得後に `AGENTS.md` の内容を再確認し、最初に読み込んだ内容から変更されていれば、競合を避けるため停止します。
 
-## Verification
+## 検証方法
 
-Run the unit tests from the repository root:
+Repositoryルートからユニットテストを実行します。
 
 ```sh
 python3 -m unittest discover -s .agents/skills/w-model-init/tests -v
 ```
 
-After setup, read back `AGENTS.md`, confirm the section and all linked files, and report whether a file was created, updated, or already current. Never claim a write succeeded without reading the result back.
+セットアップ後は `AGENTS.md` を読み戻し、追加されたセクションとすべてのリンク先を確認します。ファイルを新規作成したか、既存ファイルへ追記したか、すでに最新だったかを報告してください。書き込み結果を読み戻して確認するまでは、処理が成功したと判断しないでください。

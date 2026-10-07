@@ -1,0 +1,17 @@
+## W-Model 開発案内
+
+このRepositoryではW-Model開発規約と工程別スキルを使用します。規約の正本は[W-Model開発規約目次](.agents/docs/w-model/00-index.md)です。成果物・テスト設計・配置は規約に従い、未確定事項を推測で確定しないでください。
+
+### 作業の進め方
+
+- Feature要求から工程全体を進める場合は、[エンドツーエンド実行フロー規約](.agents/docs/w-model/08-end-to-end-workflow.md)と[`w-model-workflow`スキル](.agents/skills/w-model-workflow/SKILL.md)を参照してください。
+- 工程ごとの作業では、該当するスキルと規約を使用してください。
+  - 要求・受入仕様：[規約](.agents/docs/w-model/02-requirements-and-acceptance.md) / [`w-model-requirements`](.agents/skills/w-model-requirements/SKILL.md)
+  - Architecture・System Test：[規約](.agents/docs/w-model/03-architecture-and-system-test.md) / [`w-model-architecture`](.agents/skills/w-model-architecture/SKILL.md)
+  - Task・詳細設計・Integration Test：[規約](.agents/docs/w-model/04-task-decomposition-and-detailed-design.md) / [`w-model-task-design`](.agents/skills/w-model-task-design/SKILL.md)
+  - 実装・Unit Test：[規約](.agents/docs/w-model/05-implementation-and-unit-testing.md) / [`w-model-implementation`](.agents/skills/w-model-implementation/SKILL.md)
+  - トレーサビリティ：[規約](.agents/docs/w-model/06-traceability.md) / [`w-model-traceability`](.agents/skills/w-model-traceability/SKILL.md)
+  - テスト実行・QA判定：[規約](.agents/docs/w-model/07-test-operations-and-qa.md) / [`w-model-qa`](.agents/skills/w-model-qa/SKILL.md)
+- テスト設計文書、実行可能テスト、実行証跡の役割を区別してください。QA判定とHuman Gateの承認は別々に記録してください。
+- サブエージェントを使う場合はGeneratorとReviewer/Testを別実行にし、対象Revision・入力正本・出力・検証結果を引き継いでください。カスタムエージェント定義を作成する必要はありません。
+- Issue、ブランチ、レビュー、PR、Projectなどの作業管理は、RepositoryのAIDE共通ルールと[aide-workflowスキル](.agents/skills/aide-workflow/SKILL.md)に従ってください。

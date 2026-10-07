@@ -5,7 +5,7 @@ description: 専用テンプレートを使い、RepositoryルートのAGENTS.md
 
 # W-Model Repositoryセットアップ
 
-RepositoryへW-Model開発案内を追加するときに、このスキルを使用します。専用テンプレートは `.agents/templates/w-model/AGENTS.md.template` です。`aide-init` が使用する `.agents/templates/AGENTS.md.template` は変更しないでください。
+RepositoryへW-Model開発案内を追加するときに、このスキルを使用します。専用テンプレートは `.agents/templates/w-model/AGENTS.md.template` です。
 
 ## 実行方法
 
